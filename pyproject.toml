@@ -1,0 +1,38 @@
+[project]
+name = "pydocs"
+version = "0.1.0"
+description = "Python RAG assistant for the official Python docs: cited answers, measured by evals, deployed on Azure"
+readme = "README.md"
+authors = [
+    { name = "Endi Rexhepi", email = "endirexhepi5@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = []
+
+[project.scripts]
+pydocs = "pydocs:main"
+
+[build-system]
+requires = ["uv_build>=0.13.7,<0.14.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "mypy>=2.4.1",
+    "pre-commit>=4.7.0",
+    "pytest>=9.2.0",
+    "ruff>=0.17.3",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.mypy]
+strict = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
