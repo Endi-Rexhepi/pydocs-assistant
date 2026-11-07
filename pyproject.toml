@@ -7,7 +7,9 @@ authors = [
     { name = "Endi Rexhepi", email = "endirexhepi5@gmail.com" }
 ]
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "httpx>=0.28.1",
+]
 
 [project.scripts]
 pydocs = "pydocs:main"
