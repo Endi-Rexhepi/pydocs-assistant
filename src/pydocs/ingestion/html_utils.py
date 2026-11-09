@@ -113,14 +113,15 @@ def qualifiers(dt: Tag, kind: str) -> list[str]:
 
 
 def displayed_name(dt: Tag) -> str:
-    # the name as printed, for objects without a python anchor: "--sort-keys", "NOP"
-    prename = dt.find(class_="sig-prename")
+    # The name as printed, for objects without a python anchor: "--sort-keys", "NOP".
+    # sig-prename is only a prefix when it comes first ("json." + "dumps"). For
+    # options and pdb commands it comes after the name and holds the argument
+    # ("-m" + " <mode>", "pp" + " expression"), so it's not part of the name.
     name = dt.find(class_="sig-name")
-    text = ""
-    if isinstance(prename, Tag):
-        text += prename.get_text()
-    if isinstance(name, Tag):
-        text += name.get_text()
+    if not isinstance(name, Tag):
+        return signature_text(dt)
+    prefix = name.find_previous_sibling(class_="sig-prename")
+    text = (prefix.get_text() if isinstance(prefix, Tag) else "") + name.get_text()
     return clean(text) or signature_text(dt)
 
 

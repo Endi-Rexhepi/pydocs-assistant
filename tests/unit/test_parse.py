@@ -2,7 +2,9 @@ from functools import cache
 from pathlib import Path
 
 import pytest
+from bs4 import BeautifulSoup, Tag
 
+from pydocs.ingestion.html_utils import displayed_name
 from pydocs.ingestion.models import DocRecord
 from pydocs.ingestion.parse import _python_name, parse_page
 
@@ -130,3 +132,22 @@ def test_module_function_keeps_full_signature() -> None:
 )
 def test_python_name_restores_leading_underscores(anchor: str, module: str, expected: str) -> None:
     assert _python_name(anchor, module) == expected
+
+
+# found in the hand check: pdb's "pp expression" came out as "expressionpp"
+NAME = '<span class="sig-name">{}</span>'
+PRENAME = '<span class="sig-prename">{}</span>'
+
+
+@pytest.mark.parametrize(
+    ("html", "expected"),
+    [
+        (NAME.format("pp") + PRENAME.format(" expression"), "pp"),
+        (NAME.format("-m") + PRENAME.format(" &lt;mode&gt;"), "-m"),
+        (PRENAME.format("json.") + NAME.format("dumps"), "json.dumps"),
+    ],
+)
+def test_displayed_name_ignores_arguments_after_the_name(html: str, expected: str) -> None:
+    dt = BeautifulSoup(f"<dt>{html}</dt>", "html.parser").dt
+    assert isinstance(dt, Tag)
+    assert displayed_name(dt) == expected
